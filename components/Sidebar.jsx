@@ -11,10 +11,16 @@ export default function Sidebar() {
           <Link href="/dashboard">Dashboard</Link>
         </li>
         <li>
+          <Link href="/categories">Categories</Link>
+        </li>
+        <li>
           <Link href="/products">Products</Link>
         </li>
         <li>
           <Link href="/orders">Orders</Link>
+        </li>
+        <li>
+          <Link href="/stock">Stock</Link>
         </li>
       </ul>
     </div>

@@ -6,7 +6,7 @@ import API from "@/services/api";
 import { useRouter } from "next/navigation";
 import AuthLayout from "@/components/auth/AuthLayout";
 
-// ── Password strength helper ──────────────────────────────────────────────────
+// ── Password-strength-helper ────────────────────
 function StrengthBar({ password }) {
   const score = Math.min(4, Math.floor(password.length / 3));
   const colors = ["bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
@@ -25,7 +25,7 @@ function StrengthBar({ password }) {
   );
 }
 
-// ── Reusable field ────────────────────────────────────────────────────────────
+// ── Reusable-field ──────────────────────────────
 function Field({
   label,
   type = "text",
@@ -102,7 +102,7 @@ function Field({
   );
 }
 
-// ── Signup page ───────────────────────────────────────────────────────────────
+// ── Signup-page ─────────────────────────────────
 export default function SignupPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
