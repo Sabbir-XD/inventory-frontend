@@ -1,65 +1,47 @@
 import { memo } from "react";
 import { STATUSES } from "./constants";
+import { MdTune } from "react-icons/md";
 
 const FILTERS = ["All", ...STATUSES];
 
 const Toolbar = ({ filter, sort, onFilter, onSort }) => (
-  <div
-    style={{
-      display: "flex",
-      gap: 8,
-      marginBottom: "1rem",
-      flexWrap: "wrap",
-      alignItems: "center",
-    }}
-  >
-    <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-      {FILTERS.map((f) => (
-        <button
-          key={f}
-          onClick={() => onFilter(f)}
-          style={{
-            padding: "5px 12px",
-            borderRadius: 999,
-            border: "0.5px solid var(--color-border-secondary)",
-            background:
-              filter === f ? "var(--color-text-primary)" : "transparent",
-            color:
-              filter === f
-                ? "var(--color-background-primary)"
-                : "var(--color-text-secondary)",
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          {f}
-        </button>
-      ))}
+  <div className="flex items-center gap-3 mb-4 flex-wrap">
+    {/* Filter pills */}
+    <div className="flex items-center gap-1.5 flex-wrap flex-1">
+      {FILTERS.map((f) => {
+        const active = filter === f;
+        return (
+          <button
+            key={f}
+            onClick={() => onFilter(f)}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all
+              ${
+                active
+                  ? "bg-[#042C53] text-white"
+                  : "bg-transparent border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+              }`}
+          >
+            {f}
+          </button>
+        );
+      })}
     </div>
-    <select
-      value={sort}
-      onChange={(e) => onSort(e.target.value)}
-      style={{
-        marginLeft: "auto",
-        height: 30,
-        padding: "0 10px",
-        border: "0.5px solid var(--color-border-secondary)",
-        borderRadius: "var(--border-radius-md)",
-        background: "var(--color-background-primary)",
-        color: "var(--color-text-secondary)",
-        fontSize: 12,
-        fontFamily: "inherit",
-        cursor: "pointer",
-        outline: "none",
-      }}
-    >
-      <option value="date-desc">Newest first</option>
-      <option value="date-asc">Oldest first</option>
-      <option value="total-desc">Highest total</option>
-      <option value="total-asc">Lowest total</option>
-    </select>
+
+    {/* Sort */}
+    <div className="flex items-center gap-2">
+      <MdTune size={14} className="text-gray-400" />
+      <select
+        value={sort}
+        onChange={(e) => onSort(e.target.value)}
+        className="h-8 px-2.5 border border-gray-200 rounded-lg bg-white
+          text-gray-500 text-xs outline-none cursor-pointer"
+      >
+        <option value="date-desc">Newest first</option>
+        <option value="date-asc">Oldest first</option>
+        <option value="total-desc">Highest total</option>
+        <option value="total-asc">Lowest total</option>
+      </select>
+    </div>
   </div>
 );
 

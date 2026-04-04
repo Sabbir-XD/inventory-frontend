@@ -1,111 +1,78 @@
 "use client";
-
 import { useState, memo } from "react";
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import StatusBadge from "./StatusBadge";
 import OrderItemsTable from "./OrderItemsTable";
 import OrderActions from "./OrderActions";
-import { initials, avatarColor } from "./utils";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import {
+  initials,
+  avatarColor,
+  shortId,
+  formatDate,
+  formatPrice,
+} from "./utils";
 
 const OrderCard = ({ order, onUpdateStatus, onCancel, onDelete }) => {
   const [open, setOpen] = useState(false);
-  const { bg, fg } = avatarColor(order.customerName);
-
-  // Real API: totalPrice comes from backend, no need to recalculate
-  const total = order.totalPrice ?? 0;
-
-  const formattedDate = order.createdAt
-    ? new Date(order.createdAt).toLocaleDateString()
-    : "—";
+  const { bg, text } = avatarColor(order.customerName ?? "");
 
   return (
     <div
-      style={{
-        background: "var(--color-background-primary)",
-        border: `0.5px solid ${open ? "var(--color-border-primary)" : "var(--color-border-tertiary)"}`,
-        borderRadius: "var(--border-radius-lg)",
-        overflow: "hidden",
-      }}
+      className={`bg-white rounded-xl border transition-all duration-150
+      ${open ? "border-blue-300 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
     >
-      {/* Header row — click to expand */}
+      {/* Header */}
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "14px 16px",
-          cursor: "pointer",
-        }}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer rounded-xl
+          transition-colors ${open ? "bg-gray-50 rounded-b-none" : "hover:bg-gray-50/60"}`}
       >
         {/* Avatar */}
         <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: "50%",
-            background: bg,
-            color: fg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 13,
-            fontWeight: 500,
-            flexShrink: 0,
-          }}
+          className={`w-9 h-9 rounded-full ${bg} ${text} flex items-center
+          justify-center text-xs font-medium shrink-0`}
         >
           {initials(order.customerName)}
         </div>
 
-        {/* Customer + meta */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: "var(--color-text-primary)",
-            }}
-          >
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-900 truncate">
             {order.customerName}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--color-text-secondary)",
-              marginTop: 2,
-            }}
-          >
-            {order._id} · {formattedDate} · {order.items.length} item
-            {order.items.length !== 1 ? "s" : ""}
-          </div>
+          </p>
+          <p className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-1.5">
+            <span>{shortId(order._id)}</span>
+            <span>·</span>
+            <span>{formatDate(order.createdAt)}</span>
+            <span>·</span>
+            <span>
+              {order.items?.length ?? 0} item
+              {order.items?.length !== 1 ? "s" : ""}
+            </span>
+          </p>
         </div>
 
-        {/* Status + total + chevron */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            flexShrink: 0,
-          }}
-        >
+        {/* Right */}
+        <div className="flex items-center gap-2.5 shrink-0">
           <StatusBadge status={order.status} />
-          <span style={{ fontSize: 15, fontWeight: 500 }}>
-            ${total.toFixed(2)}
+          <span className="text-sm font-medium text-gray-900 min-w-[56px] text-right">
+            {formatPrice(order.totalPrice ?? 0)}
           </span>
-          {open ? <FaChevronUp /> : <FaChevronDown />}
+          {open ? (
+            <MdExpandLess size={18} className="text-gray-400" />
+          ) : (
+            <MdExpandMore size={18} className="text-gray-400" />
+          )}
         </div>
       </div>
 
       {/* Expanded body */}
       {open && (
-        <div
-          style={{
-            borderTop: "0.5px solid var(--color-border-tertiary)",
-            padding: "14px 16px",
-          }}
-        >
-          <OrderItemsTable items={order.items} />
+        <div className="px-4 pt-3.5 pb-4 border-t border-gray-100">
+          <OrderItemsTable
+            items={order.items ?? []}
+            totalPrice={order.totalPrice}
+          />
           <OrderActions
             order={order}
             onUpdateStatus={onUpdateStatus}

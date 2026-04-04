@@ -1,128 +1,73 @@
 "use client";
-
-import { useEffect, useState, useCallback } from "react";
-import { useOrders } from "../../hooks/useOrders";
+import { useState, useMemo } from "react";
+import { MdAdd } from "react-icons/md";
+import { useOrders } from "@/hooks/useOrders";
 import StatsRow from "./StatsRow";
 import Toolbar from "./Toolbar";
 import OrderCard from "./OrderCard";
 import CreateOrderModal from "./CreateOrderModal";
-import { FaPlus } from "react-icons/fa";
 
-export default function OrderManagement() {
+export default function OrdersPage() {
   const {
     orders,
     loading,
     error,
-    fetchOrders,
     createOrder,
     updateStatus,
     cancelOrder,
+    deleteOrder,
   } = useOrders();
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("date-desc");
-  const [showCreate, setShowCreate] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  // Fetch on mount and when filter changes
-  useEffect(() => {
-    fetchOrders(filter === "All" ? "" : filter);
-  }, [filter, fetchOrders]);
+  const filtered = useMemo(() => {
+    const list =
+      filter === "All" ? orders : orders.filter((o) => o.status === filter);
+    return [...list].sort((a, b) => {
+      if (sort === "date-desc")
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sort === "date-asc")
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sort === "total-desc")
+        return (b.totalPrice ?? 0) - (a.totalPrice ?? 0);
+      if (sort === "total-asc")
+        return (a.totalPrice ?? 0) - (b.totalPrice ?? 0);
+      return 0;
+    });
+  }, [orders, filter, sort]);
 
-  const sorted = [...orders].sort((a, b) => {
-    if (sort === "date-desc")
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    if (sort === "date-asc")
-      return new Date(a.createdAt) - new Date(b.createdAt);
-    if (sort === "total-desc") return b.totalPrice - a.totalPrice;
-    if (sort === "total-asc") return a.totalPrice - b.totalPrice;
-    return 0;
-  });
-
-  const handleCreate = useCallback(
-    async (payload) => {
-      const result = await createOrder(payload);
-      if (result) setShowCreate(false);
-    },
-    [createOrder],
-  );
-
-  if (showCreate)
-    return (
-      <CreateOrderModal
-        onClose={() => setShowCreate(false)}
-        onCreate={handleCreate}
-      />
-    );
+  const handleCreate = async (payload) => {
+    try {
+      await createOrder(payload);
+      setShowModal(false);
+    } catch (err) {
+      throw err;
+    }
+  };
 
   return (
-    <div
-      style={{ padding: "1.25rem 1rem 2rem", maxWidth: 700, margin: "0 auto" }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "1.5rem",
-        }}
-      >
+    <div className="max-w-4xl mx-auto py-7 px-1">
+      {/* Page header */}
+      <div className="flex items-start justify-between mb-6">
         <div>
-          <span
-            style={{
-              fontSize: 20,
-              fontWeight: 500,
-              color: "var(--color-text-primary)",
-            }}
-          >
-            Order management
-          </span>
-          <span
-            style={{
-              fontSize: 13,
-              color: "var(--color-text-secondary)",
-              marginLeft: 10,
-            }}
-          >
-            {orders.length} orders
-          </span>
+          <h1 className="text-xl font-medium text-gray-900">Orders</h1>
+          <p className="text-sm text-gray-400 mt-1">
+            {orders.length} total ·{" "}
+            <span className="text-amber-600">
+              {orders.filter((o) => o.status === "Pending").length} pending
+            </span>
+          </p>
         </div>
         <button
-          onClick={() => setShowCreate(true)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "7px 16px",
-            border: "none",
-            borderRadius: "var(--border-radius-md)",
-            background: "var(--color-text-primary)",
-            color: "var(--color-background-primary)",
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
+          onClick={() => setShowModal(true)}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl
+            bg-[#042C53] text-white text-sm font-medium
+            hover:bg-[#0C447C] transition-colors"
         >
-          <FaPlus /> New order
+          <MdAdd size={17} /> New order
         </button>
       </div>
-
-      {/* Error */}
-      {error && (
-        <div
-          style={{
-            padding: "10px 14px",
-            background: "var(--color-background-danger)",
-            color: "var(--color-text-danger)",
-            border: "0.5px solid var(--color-border-danger)",
-            borderRadius: "var(--border-radius-md)",
-            fontSize: 13,
-            marginBottom: "1rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
 
       <StatsRow orders={orders} />
       <Toolbar
@@ -132,47 +77,47 @@ export default function OrderManagement() {
         onSort={setSort}
       />
 
-      {/* Loading */}
+      {/* States */}
       {loading && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "2rem",
-            color: "var(--color-text-tertiary)",
-            fontSize: 13,
-          }}
-        >
+        <div className="text-center py-16 text-sm text-gray-400">
           Loading orders…
         </div>
       )}
+      {error && (
+        <div className="text-center py-16 text-sm text-red-500">{error}</div>
+      )}
 
-      {/* Orders list */}
-      {!loading && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {sorted.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "2.5rem",
-                color: "var(--color-text-tertiary)",
-                fontSize: 13,
-                border: "0.5px solid var(--color-border-tertiary)",
-                borderRadius: "var(--border-radius-lg)",
-              }}
-            >
-              No orders found.
+      {/* List */}
+      {!loading && !error && (
+        <div className="flex flex-col gap-2">
+          {filtered.length === 0 ? (
+            <div className="text-center py-16 text-sm text-gray-400">
+              No orders match this filter.
             </div>
           ) : (
-            sorted.map((o) => (
+            filtered.map((o) => (
               <OrderCard
                 key={o._id}
                 order={o}
                 onUpdateStatus={updateStatus}
                 onCancel={cancelOrder}
-                onDelete={() => {}} // wire a deleteOrder service if needed
+                onDelete={deleteOrder}
               />
             ))
           )}
+        </div>
+      )}
+
+      {/* Modal overlay */}
+      {showModal && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center
+          justify-center p-4"
+        >
+          <CreateOrderModal
+            onClose={() => setShowModal(false)}
+            onCreate={handleCreate}
+          />
         </div>
       )}
     </div>

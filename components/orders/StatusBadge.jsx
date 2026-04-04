@@ -1,42 +1,31 @@
 import { memo } from "react";
 
-const STATUS_STYLES = {
-  Pending: { bg: "#FAEEDA", fg: "#633806", dot: "#854F0B" },
-  Confirmed: { bg: "#E6F1FB", fg: "#0C447C", dot: "#185FA5" },
-  Shipped: { bg: "#EEEDFE", fg: "#3C3489", dot: "#534AB7" },
-  Delivered: { bg: "#EAF3DE", fg: "#27500A", dot: "#3B6D11" },
-  Cancelled: { bg: "#FCEBEB", fg: "#791F1F", dot: "#A32D2D" },
+const STYLES = {
+  Pending: "bg-amber-50  text-amber-800  ring-amber-200",
+  Confirmed: "bg-blue-50   text-blue-800   ring-blue-200",
+  Shipped: "bg-purple-50 text-purple-800 ring-purple-200",
+  Delivered: "bg-green-50  text-green-800  ring-green-200",
+  Cancelled: "bg-red-50    text-red-800    ring-red-200",
 };
 
-const StatusBadge = ({ status }) => {
-  const { bg, fg, dot } = STATUS_STYLES[status] ?? STATUS_STYLES.Pending;
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 5,
-        fontSize: 11,
-        fontWeight: 500,
-        padding: "3px 9px",
-        borderRadius: 999,
-        background: bg,
-        color: fg,
-        whiteSpace: "nowrap",
-      }}
-    >
-      <span
-        style={{
-          width: 5,
-          height: 5,
-          borderRadius: "50%",
-          background: dot,
-          flexShrink: 0,
-        }}
-      />
-      {status}
-    </span>
-  );
+const DOT = {
+  Pending: "bg-amber-500",
+  Confirmed: "bg-blue-500",
+  Shipped: "bg-purple-500",
+  Delivered: "bg-green-500",
+  Cancelled: "bg-red-500",
 };
+
+const StatusBadge = ({ status }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 text-[11px] font-medium
+    px-2.5 py-1 rounded-full ring-1 ${STYLES[status] ?? STYLES.Pending}`}
+  >
+    <span
+      className={`w-1.5 h-1.5 rounded-full ${DOT[status] ?? DOT.Pending}`}
+    />
+    {status}
+  </span>
+);
 
 export default memo(StatusBadge);

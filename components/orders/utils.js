@@ -1,24 +1,26 @@
-import { PRODUCTS, AVATAR_COLORS } from "./constants";
+const AVATAR_COLORS = [
+    { bg: "bg-blue-50", text: "text-blue-800" },
+    { bg: "bg-teal-50", text: "text-teal-800" },
+    { bg: "bg-purple-50", text: "text-purple-800" },
+    { bg: "bg-amber-50", text: "text-amber-800" },
+    { bg: "bg-pink-50", text: "text-pink-800" },
+];
 
-let _counter = 10;
-export const uid = () => `ord-${++_counter}`;
+export const initials = (name = "") =>
+    name.trim().split(" ").filter(Boolean)
+        .slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 
-export const calcTotal = (items) =>
-    items.reduce((sum, it) => {
-        const p = PRODUCTS.find((x) => x._id === it.productId);
-        return sum + (p ? p.price * (parseInt(it.qty) || 0) : 0);
-    }, 0);
-
-export const initials = (name) =>
-    name.trim().split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-
-export const avatarColor = (name) =>
+export const avatarColor = (name = "") =>
     AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
-export const SEED_ORDERS = [
-    { id: "ord-1", customer: "Alex Johnson", date: "2026-04-01", status: "Delivered", items: [{ productId: "p1", qty: 2 }, { productId: "p5", qty: 1 }] },
-    { id: "ord-2", customer: "Sara Ahmed", date: "2026-04-02", status: "Shipped", items: [{ productId: "p2", qty: 1 }, { productId: "p3", qty: 2 }] },
-    { id: "ord-3", customer: "Carlos Rivera", date: "2026-04-02", status: "Confirmed", items: [{ productId: "p4", qty: 1 }] },
-    { id: "ord-4", customer: "Mei Lin", date: "2026-04-03", status: "Pending", items: [{ productId: "p6", qty: 3 }, { productId: "p1", qty: 1 }] },
-    { id: "ord-5", customer: "Tom Baker", date: "2026-03-30", status: "Cancelled", items: [{ productId: "p2", qty: 2 }] },
-];
+export const shortId = (id = "") => "#" + id.slice(-6).toUpperCase();
+
+export const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric",
+    });
+};
+
+export const formatPrice = (amount = 0) =>
+    "$" + Number(amount).toFixed(2);

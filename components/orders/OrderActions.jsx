@@ -1,19 +1,6 @@
 import { memo } from "react";
 import { STATUS_NEXT } from "./constants";
-
-const btn = (extra = {}) => ({
-  padding: "6px 14px",
-  borderRadius: "var(--border-radius-md)",
-  border: "0.5px solid var(--color-border-secondary)",
-  background: "transparent",
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-  fontFamily: "inherit",
-  color: "var(--color-text-secondary)",
-  transition: "all .12s",
-  ...extra,
-});
+import { MdArrowForward, MdCancel, MdDeleteOutline } from "react-icons/md";
 
 const OrderActions = ({ order, onUpdateStatus, onCancel, onDelete }) => {
   const next = STATUS_NEXT[order.status];
@@ -21,32 +8,39 @@ const OrderActions = ({ order, onUpdateStatus, onCancel, onDelete }) => {
     order.status !== "Cancelled" && order.status !== "Delivered";
 
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div className="flex items-center gap-2 flex-wrap">
       {next && (
         <button
-          style={btn({
-            background: "var(--color-text-primary)",
-            color: "var(--color-background-primary)",
-            borderColor: "var(--color-text-primary)",
-          })}
-          onClick={() => onUpdateStatus(order.id, next)}
+          onClick={() => onUpdateStatus(order._id, next)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg
+            bg-[#042C53] text-white text-xs font-medium
+            hover:bg-[#0C447C] transition-colors"
         >
-          Mark as {next}
+          <MdArrowForward size={13} /> Mark as {next}
         </button>
       )}
+
       {canCancel && (
         <button
-          style={btn({ color: "#A32D2D", borderColor: "#F09595" })}
-          onClick={() => onCancel(order.id)}
+          onClick={() => onCancel(order._id)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg
+            border border-red-200 text-red-700 text-xs font-medium bg-transparent
+            hover:bg-red-50 transition-colors"
         >
-          Cancel order
+          <MdCancel size={13} /> Cancel
         </button>
       )}
+
       <button
-        style={btn({ marginLeft: "auto" })}
-        onClick={() => onDelete(order.id)}
+        onClick={() => {
+          if (confirm("Delete this order permanently?")) onDelete(order._id);
+        }}
+        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg
+          border border-gray-200 text-gray-500 text-xs font-medium bg-transparent
+          hover:bg-gray-50 hover:text-red-600 hover:border-red-200
+          transition-colors ml-auto"
       >
-        Delete
+        <MdDeleteOutline size={14} /> Delete
       </button>
     </div>
   );
