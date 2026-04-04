@@ -55,7 +55,7 @@ export default function LoginPage() {
   const router                = useRouter();
 
   const handleDemoLogin = () =>
-    setForm({ email: "demo@gmail.com", password: "123456" });
+    setForm({ email: "demo@gmail.com", password: "Demo@1234567" });
 
   const handleLogin = async () => {
     if (!form.email || !form.password) return alert("Please fill in all fields.");

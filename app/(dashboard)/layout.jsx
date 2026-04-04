@@ -3,7 +3,7 @@ import Sidebar from "@/components/Sidebar";
 export default function DashboardLayout({ children }) {
   return (
     <div className="flex">
-      <aside className="w-64 bg-gray-800 text-white p-4">
+      <aside className="w-74">
         <Sidebar />
       </aside>
 
